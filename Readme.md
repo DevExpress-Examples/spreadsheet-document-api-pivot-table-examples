@@ -1,3 +1,16 @@
+<!-- default file list -->
+*Files to look at*:
+
+* [PivotCalculatedFieldActions.cs](./CS/SpreadsheetDocServerPivotAPI/CodeExamples/PivotCalculatedFieldActions.cs) (VB: [PivotCalculatedFieldActions.vb](./VB/SpreadsheetDocServerPivotAPI/CodeExamples/PivotCalculatedFieldActions.vb))
+* [PivotCalculatedItemActions.cs](./CS/SpreadsheetDocServerPivotAPI/CodeExamples/PivotCalculatedItemActions.cs) (VB: [PivotCalculatedItemActions.vb](./VB/SpreadsheetDocServerPivotAPI/CodeExamples/PivotCalculatedItemActions.vb))
+* [PivotFieldActions.cs](./CS/SpreadsheetDocServerPivotAPI/CodeExamples/PivotFieldActions.cs) (VB: [PivotFieldActions.vb](./VB/SpreadsheetDocServerPivotAPI/CodeExamples/PivotFieldActions.vb))
+* [PivotFieldGroupingActions.cs](./CS/SpreadsheetDocServerPivotAPI/CodeExamples/PivotFieldGroupingActions.cs) (VB: [PivotFieldGroupingActions.vb](./VB/SpreadsheetDocServerPivotAPI/CodeExamples/PivotFieldGroupingActions.vb))
+* [PivotTableActions.cs](./CS/SpreadsheetDocServerPivotAPI/CodeExamples/PivotTableActions.cs) (VB: [PivotTableActions.vb](./VB/SpreadsheetDocServerPivotAPI/CodeExamples/PivotTableActions.vb))
+* [PivotTableFilterActions.cs](./CS/SpreadsheetDocServerPivotAPI/CodeExamples/PivotTableFilterActions.cs) (VB: [PivotTableFilterActions.vb](./VB/SpreadsheetDocServerPivotAPI/CodeExamples/PivotTableFilterActions.vb))
+* [PivotTableFormattingActions.cs](./CS/SpreadsheetDocServerPivotAPI/CodeExamples/PivotTableFormattingActions.cs) (VB: [PivotTableFormattingActions.vb](./VB/SpreadsheetDocServerPivotAPI/CodeExamples/PivotTableFormattingActions.vb))
+* [PivotTableLayoutActions.cs](./CS/SpreadsheetDocServerPivotAPI/CodeExamples/PivotTableLayoutActions.cs) (VB: [PivotTableLayoutActions.vb](./VB/SpreadsheetDocServerPivotAPI/CodeExamples/PivotTableLayoutActions.vb))
+* [ValueFieldSettingsActions.cs](./CS/SpreadsheetDocServerPivotAPI/CodeExamples/ValueFieldSettingsActions.cs) (VB: [ValueFieldSettingsActions.vb](./VB/SpreadsheetDocServerPivotAPI/CodeExamples/ValueFieldSettingsActions.vb))
+<!-- default file list end -->
 # Spreadsheet Pivot Table API
 
 
