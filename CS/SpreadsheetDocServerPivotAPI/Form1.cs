@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace SpreadsheetDocServerPivotAPI
 {
-    public partial class Form1 : Form
+    public partial class Form1 : DevExpress.XtraEditors.XtraForm
     {
         Workbook workbook = new Workbook();
         CultureInfo defaultCulture = new CultureInfo("en-US");

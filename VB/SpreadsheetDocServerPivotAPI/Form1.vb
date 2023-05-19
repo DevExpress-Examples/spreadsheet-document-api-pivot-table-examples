@@ -11,7 +11,7 @@ Imports System.Windows.Forms
 
 Namespace SpreadsheetDocServerPivotAPI
     Partial Public Class Form1
-        Inherits Form
+        Inherits DevExpress.XtraEditors.XtraForm
 
         Private workbook As New Workbook()
         Private defaultCulture As New CultureInfo("en-US")

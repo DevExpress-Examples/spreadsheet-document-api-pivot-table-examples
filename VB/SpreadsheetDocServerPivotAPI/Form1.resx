@@ -118,16 +118,16 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="btnOpenExcel.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="btnOpenExcel.ImageOptions.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAZdEVYdFNvZnR3YXJlAEFkb2JlIEltYWdlUmVhZHlxyWU8AAAAH3RFWHRUaXRsZQBFeHBvcnQ7
-        WHNsdDtFeHBvcnRUb1hzbHQ7E9Z7mwAAATVJREFUWEflkD0OwjAMhTlfj8IBOEHXDoiBqTMTYmRiQGLi
-        Dp2QOAQM4T2EUXCdNqWh/D3pk2vXaT4YOefeijkcEnM4JOZwSMwhyfPcdeQAMsCzNaw7iDkkOIQSH+4X
-        RXEuyzJDq7/10PuYwxudQoGqqkyJVoHJYu76wMg/ZklQAHs1+C65AKMlogQYq5LlfnvtmdCuL8DcJE6U
-        iBaQi6Rn1c/S610twIgE3mXYaxaQD7KyZ1itd9YuBRo4Yq9ZgJEPS8/qIzNG7zaFEthrF9CV8Z/9X2zt
-        hhIl0Ie2fIWA9TJZWgVm41UNHkoZ6w6M0wmspjtecoWRZx8136BNJ4Azd0K9VG/+JwKhOfI6gVDU3msE
-        YkF+UCAm3u6HC8TC4ExagSf4DIEupBZYA/OiAOu7wPtwowuMgNC7nUqdgQAAAABJRU5ErkJggg==
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABGdBTUEAALGPC/xhBQAAABl0RVh0U29m
+        dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAAfdEVYdFRpdGxlAEV4cG9ydDtYc2x0O0V4cG9ydFRv
+        WHNsdDsT1nubAAABNUlEQVRYR+WQPQ7CMAyFOV+PwgE4QdcOiIGpMxNiZGJAYuIOnZA4BAzhPYRRcJ02
+        paH8PemTa9dpPhg5596KORwSczgk5nBIzCHJ89x15AAywLM1rDuIOSQ4hBIf7hdFcS7LMkOrv/XQ+5jD
+        G51CgaqqTIlWgcli7vrAyD9mSVAAezX4LrkAoyWiBBirkuV+e+2Z0K4vwNwkTpSIFpCLpGfVz9LrXS3A
+        iATeZdhrFpAPsrJnWK131i4FGjhir1mAkQ9Lz+ojM0bvNoUS2GsX0JXxn/1fbO2GEiXQh7Z8hYD1Mlla
+        BWbjVQ0eShnrDozTCaymO15yhZFnHzXfoE0ngDN3Qr1Ub/4nAqE58jqBUNTeawRiQX5QICbe7ocLxMLg
+        TFqBJ/gMgS6kFlgD86IA67vA+3CjC4yA0LudSp2BAAAAAElFTkSuQmCC
 </value>
   </data>
   <metadata name="defaultLookAndFeel1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
