@@ -18,8 +18,8 @@ Namespace SpreadsheetDocServerPivotAPI
             pivotTable.Fields(1).ShowSingleItem(0)
 
             'Show all items in the "Product" field (the default option).
-            'pivotTable.Fields[1].ShowAllItems();
-'            #End Region ' #ItemFilter
+            'pivotTable.Fields(1).ShowAllItems()
+            '            #End Region ' #ItemFilter
         End Sub
 
         Private Shared Sub SetItemVisibilityFilter(ByVal workbook As IWorkbook)
