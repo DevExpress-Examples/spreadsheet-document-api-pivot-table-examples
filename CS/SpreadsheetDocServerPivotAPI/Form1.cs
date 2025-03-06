@@ -1,4 +1,5 @@
 ﻿using DevExpress.Spreadsheet;
+using DevExpress.XtraEditors;
 using DevExpress.XtraTab;
 using DevExpress.XtraTreeList;
 using DevExpress.XtraTreeList.Columns;
@@ -14,215 +15,152 @@ namespace SpreadsheetDocServerPivotAPI
     public partial class Form1 : DevExpress.XtraEditors.XtraForm
     {
         Workbook workbook = new Workbook();
-        CultureInfo defaultCulture = new CultureInfo("en-US");
-
-        ExampleCodeEditor codeEditor;
-        ExampleEvaluatorByTimer evaluator;
-        List<CodeExampleGroup> examples;
-        bool treeListRootNodeLoading = true;
-
         public Form1()
         {
             InitializeComponent();
-            string examplePath = CodeExampleDemoUtils.GetExamplePath("CodeExamples");
-
-            Dictionary<string, FileInfo> examplesCS = CodeExampleDemoUtils.GatherExamplesFromProject(examplePath, ExampleLanguage.Csharp);
-            Dictionary<string, FileInfo> examplesVB = CodeExampleDemoUtils.GatherExamplesFromProject(examplePath, ExampleLanguage.VB);
-            DisableTabs(examplesCS.Count, examplesVB.Count);
-            this.examples = CodeExampleDemoUtils.FindExamples(examplePath, examplesCS, examplesVB);
-            RearrangeExamples();
-            MergeGroups();
-            ShowExamplesInTreeList(treeList1, examples);
-
-            this.codeEditor = new ExampleCodeEditor(richEditControlCS, richEditControlVB);
-            CurrentExampleLanguage = CodeExampleDemoUtils.DetectExampleLanguage("SpreadsheetDocServerPivotAPI");
-            this.evaluator = new SpreadsheetExampleEvaluatorByTimer();
-
-            this.evaluator.QueryEvaluate += OnExampleEvaluatorQueryEvaluate;
-            this.evaluator.OnBeforeCompile += evaluator_OnBeforeCompile;
-            this.evaluator.OnAfterCompile += evaluator_OnAfterCompile;
-
-            ShowFirstExample();
-            this.xtraTabControl1.SelectedPageChanged += new TabPageChangedEventHandler(this.xtraTabControl1_SelectedPageChanged);
+            InitTreeListControl();
+            workbook.Options.CalculationMode = WorkbookCalculationMode.Automatic;
         }
 
-        private void MergeGroups()
+        void InitTreeListControl()
         {
-            var uniqueNameGroup = new Dictionary<string, CodeExampleGroup>();
-            foreach (CodeExampleGroup n in examples)
-                if (uniqueNameGroup.ContainsKey(n.Name))
-                {
-                    uniqueNameGroup[n.Name].Merge(n);
-                }
-                else
-                {
-                    uniqueNameGroup[n.Name] = n;
-                }
-
-            examples.Clear();
-            foreach (var value in uniqueNameGroup.Values)
-                examples.Add(value);
+            GroupsOfSpreadsheetExamples examples = new GroupsOfSpreadsheetExamples();
+            InitData(examples);
+            DataBinding(examples);
         }
 
-        void RearrangeExamples()
+        void InitData(GroupsOfSpreadsheetExamples examples)
         {
-            for (int i = 0; i < examples.Count; i++)
-            {
-                CodeExampleGroup group = examples[i];
-                if (group.Name == "Pivot Table Actions")
-                {
-                    examples.RemoveAt(i);
-                    examples.Insert(0, group);
-                    break;
-                }
-            }
-        }
+            #region GroupNodes
+            examples.Add(new SpreadsheetNode("Pivot Calculated Fields"));
+            examples.Add(new SpreadsheetNode("Pivot Calculated Item"));
+            examples.Add(new SpreadsheetNode("Pivot Fields"));
+            examples.Add(new SpreadsheetNode("Pivot Field Groups"));
+            examples.Add(new SpreadsheetNode("Pivot Tables"));
+            examples.Add(new SpreadsheetNode("Pivot Table Filter"));
+            examples.Add(new SpreadsheetNode("Pivot Table Formatting"));
+            examples.Add(new SpreadsheetNode("Pivot Table Layout"));
+            examples.Add(new SpreadsheetNode("Value Field Settings"));
 
-        void evaluator_OnAfterCompile(object sender, OnAfterCompileEventArgs args)
-        {
-            codeEditor.AfterCompile(args.Result);
-            workbook.Worksheets.ActiveWorksheet.Visible = true;
-            workbook.EndUpdate();
-        }
-
-        void evaluator_OnBeforeCompile(object sender, EventArgs e)
-        {
-            workbook.BeginUpdate();
-            codeEditor.BeforeCompile();
-            workbook.Options.Culture = defaultCulture;
-            bool loaded = workbook.LoadDocument("PivotTableTemplate.xlsx");
-            Debug.Assert(loaded);
-        }
-        ExampleLanguage CurrentExampleLanguage
-        {
-            get { return (ExampleLanguage)xtraTabControl1.SelectedTabPageIndex; }
-            set
-            {
-                this.codeEditor.CurrentExampleLanguage = value;
-                xtraTabControl1.SelectedTabPageIndex = (value == ExampleLanguage.Csharp) ? 0 : 1;
-            }
-        }
-        void ShowExamplesInTreeList(TreeList treeList, List<CodeExampleGroup> examples)
-        {
-            #region InitializeTreeList
-            treeList.OptionsPrint.UsePrintStyles = true;
-            treeList.FocusedNodeChanged += new DevExpress.XtraTreeList.FocusedNodeChangedEventHandler(this.OnNewExampleSelected);
-            treeList.OptionsView.ShowColumns = false;
-            treeList.OptionsView.ShowIndicator = false;
-
-            treeList.VirtualTreeGetChildNodes += treeList_VirtualTreeGetChildNodes;
-            treeList.VirtualTreeGetCellValue += treeList_VirtualTreeGetCellValue;
             #endregion
 
-            TreeListColumn col1 = new TreeListColumn();
-            col1.VisibleIndex = 0;
-            col1.OptionsColumn.AllowEdit = false;
-            col1.OptionsColumn.AllowMove = false;
-            col1.OptionsColumn.ReadOnly = true;
-            treeList.Columns.AddRange(new TreeListColumn[] { col1 });
+            #region ExampleNodes
+            // Add nodes to the "Calculated Field" group of examples.
+            examples[0].Groups.Add(new SpreadsheetExample("Add Calculated Field", PivotCalculatedFieldActions.AddCalculatedFieldAction));
+            examples[0].Groups.Add(new SpreadsheetExample("Modify Calculated Field", PivotCalculatedFieldActions.ModifyCalculatedFieldAction));
+            examples[0].Groups.Add(new SpreadsheetExample("Remove Calculated Field", PivotCalculatedFieldActions.RemoveCalculatedFieldAction));
 
-            treeList.DataSource = new Object();
-            treeList.ExpandAll();
+            // Add nodes to the "Calculated Item" group of examples.
+            examples[1].Groups.Add(new SpreadsheetExample("Add Calculated Item", PivotCalculatedItemActions.AddCalculatedItemAction));
+            examples[1].Groups.Add(new SpreadsheetExample("Modify Calculated Item", PivotCalculatedItemActions.ModifyCalculatedItemAction));
+            examples[1].Groups.Add(new SpreadsheetExample("Remove Calculated Item", PivotCalculatedItemActions.RemoveCalculatedItemAction));
+
+            // Add nodes to the "Pivot Field" group of examples.
+            examples[2].Groups.Add(new SpreadsheetExample("Add Field to Axis", PivotFieldActions.AddFieldToAxisAction));
+            examples[2].Groups.Add(new SpreadsheetExample("Insert Field to Axis", PivotFieldActions.InsertFieldToAxisAction));
+            examples[2].Groups.Add(new SpreadsheetExample("Move Field Down", PivotFieldActions.MoveFieldDownAction));
+            examples[2].Groups.Add(new SpreadsheetExample("Move Field to Axis", PivotFieldActions.MoveFieldToAxisAction));
+            examples[2].Groups.Add(new SpreadsheetExample("Move Field Up", PivotFieldActions.MoveFieldUpAction));
+            examples[2].Groups.Add(new SpreadsheetExample("Multiple Subtotals", PivotFieldActions.MultipleSubtotalsAction));
+            examples[2].Groups.Add(new SpreadsheetExample("Remove Field from Axis", PivotFieldActions.RemoveFieldFromAxisAction));
+            examples[2].Groups.Add(new SpreadsheetExample("Sort Field Items", PivotFieldActions.SortFieldItemsAction));
+            examples[2].Groups.Add(new SpreadsheetExample("Sort Field Items by Data Field", PivotFieldActions.SortFieldItemsByDataFieldAction));
+
+
+            // Add nodes to the "Chart Legend" group of examples.
+            examples[3].Groups.Add(new SpreadsheetExample("Group Field by Dates", PivotFieldGroupingActions.GroupFieldByDatesAction));
+            examples[3].Groups.Add(new SpreadsheetExample("Group Field Items", PivotFieldGroupingActions.GroupFieldItemsAction));
+            examples[3].Groups.Add(new SpreadsheetExample("Ungroup Field Items", PivotFieldGroupingActions.UngroupFieldItemsAction));
+            examples[3].Groups.Add(new SpreadsheetExample("Ungroup Specific Item", PivotFieldGroupingActions.UngroupSpecificItemAction));
+
+            // Add nodes to the "Pivot Table" group of examples.        
+            examples[4].Groups.Add(new SpreadsheetExample("Create Pivot Table from Cache", PivotTableActions.CreatePivotTableFromCacheAction)); 
+            examples[4].Groups.Add(new SpreadsheetExample("Create Pivot Table from Range", PivotTableActions.CreatePivotTableFromRangeAction)); 
+            examples[4].Groups.Add(new SpreadsheetExample("Change Behavior Options", PivotTableActions.ChangeBehaviorOptionsAction)); 
+            examples[4].Groups.Add(new SpreadsheetExample("Change Pivot Table Data Source", PivotTableActions.ChangePivotTableDataSourceAction)); 
+            examples[4].Groups.Add(new SpreadsheetExample("Change Pivot Table Location", PivotTableActions.ChangePivotTableLocationAction));
+            examples[4].Groups.Add(new SpreadsheetExample("Clear Pivot Table", PivotTableActions.ClearPivotTableAction));
+            examples[4].Groups.Add(new SpreadsheetExample("Move Pivot Table to Worksheet", PivotTableActions.MovePivotTableToWorksheetAction));
+            examples[4].Groups.Add(new SpreadsheetExample("Remove Pivot Table", PivotTableActions.RemovePivotTableAction));
+
+            // Add nodes to the "Pivot Table Filter" group of examples.
+            examples[5].Groups.Add(new SpreadsheetExample("Set Item Filter", PivotTableFilterActions.SetItemFilterAction));
+            examples[5].Groups.Add(new SpreadsheetExample("Set Label Filter", PivotTableFilterActions.SetLabelFilterAction));
+            examples[5].Groups.Add(new SpreadsheetExample("Set Date Filter", PivotTableFilterActions.SetDateFilterAction));
+            examples[5].Groups.Add(new SpreadsheetExample("Set Multiple Filter", PivotTableFilterActions.SetMultipleFilterAction));
+            examples[5].Groups.Add(new SpreadsheetExample("Set Top 10 Filter", PivotTableFilterActions.SetTop10FilterAction));
+            examples[5].Groups.Add(new SpreadsheetExample("Set Value Filter", PivotTableFilterActions.SetValueFilterAction));
+            examples[5].Groups.Add(new SpreadsheetExample("Set Item Visibility Filter", PivotTableFilterActions.SetItemVisibilityFilterAction));
+
+            // Add nodes to the "Pivot Table Formatting" group of examples.
+            examples[6].Groups.Add(new SpreadsheetExample("Banded Columns", PivotTableFormattingActions.BandedColumnsAction));
+            examples[6].Groups.Add(new SpreadsheetExample("Banded Rows", PivotTableFormattingActions.BandedRowsAction));
+            examples[6].Groups.Add(new SpreadsheetExample("Change Pivot Table Style", PivotTableFormattingActions.ChangeStylePivotTableAction));
+            examples[6].Groups.Add(new SpreadsheetExample("Show Column Headers", PivotTableFormattingActions.ShowColumnHeadersAction));
+            examples[6].Groups.Add(new SpreadsheetExample("Show Row Headers", PivotTableFormattingActions.ShowRowHeadersAction));
+
+            // Add nodes to the "Pivot Table Layout" group of examples.
+            examples[7].Groups.Add(new SpreadsheetExample("Column Grand Totals", PivotTableLayoutActions.ColumnGrandTotalsAction));
+            examples[7].Groups.Add(new SpreadsheetExample("Data On Rows", PivotTableLayoutActions.DataOnRowsAction));
+            examples[7].Groups.Add(new SpreadsheetExample("Hide All Subtotals", PivotTableLayoutActions.HideAllSubtotalsAction));
+            examples[7].Groups.Add(new SpreadsheetExample("Insert Blank Rows", PivotTableLayoutActions.InsertBlankRowsAction));
+            examples[7].Groups.Add(new SpreadsheetExample("Merge Titles", PivotTableLayoutActions.MergeTitlesAction));
+            examples[7].Groups.Add(new SpreadsheetExample("Remove Blank Rows", PivotTableLayoutActions.RemoveBlankRowsAction));
+            examples[7].Groups.Add(new SpreadsheetExample("Repeat All Item Labels", PivotTableLayoutActions.RepeatAllItemLabelsAction));
+            examples[7].Groups.Add(new SpreadsheetExample("Row Grand Totals", PivotTableLayoutActions.RowGrandTotalsAction));
+            examples[7].Groups.Add(new SpreadsheetExample("Set Compact Report Layout", PivotTableLayoutActions.SetCompactReportLayoutAction));
+            examples[7].Groups.Add(new SpreadsheetExample("Set Outline Report Layout", PivotTableLayoutActions.SetOutlineReportLayoutAction));
+            examples[7].Groups.Add(new SpreadsheetExample("Set Tabular Report Layout", PivotTableLayoutActions.SetTabularReportLayoutAction));
+            examples[7].Groups.Add(new SpreadsheetExample("Show All Subtotals", PivotTableLayoutActions.ShowAllSubtotalsAction));
+
+            // Add nodes to the "Value Field Settings" group of examples.
+            examples[8].Groups.Add(new SpreadsheetExample("Change Summary Function", ValueFieldSettingsActions.ChangeSummaryFunctionAction));
+            examples[8].Groups.Add(new SpreadsheetExample("Difference From", ValueFieldSettingsActions.DifferenceFromAction));
+            examples[8].Groups.Add(new SpreadsheetExample("Number Format", ValueFieldSettingsActions.NumberFormatAction));
+            examples[8].Groups.Add(new SpreadsheetExample("Percent Of", ValueFieldSettingsActions.PercentOfAction));
+            examples[8].Groups.Add(new SpreadsheetExample("Percent Of Parent Row", ValueFieldSettingsActions.PercentOfParentRowTotalAction));
+            examples[8].Groups.Add(new SpreadsheetExample("Rank Largest to Smallest", ValueFieldSettingsActions.RankLargestToSmallestAction));
+            examples[8].Groups.Add(new SpreadsheetExample("Running Total In", ValueFieldSettingsActions.RunningTotalInAction));
+            #endregion
         }
 
-        void treeList_VirtualTreeGetCellValue(object sender, VirtualTreeGetCellValueInfo args)
+        void DataBinding(GroupsOfSpreadsheetExamples examples)
         {
-            CodeExampleGroup group = args.Node as CodeExampleGroup;
-            if (group != null)
-                args.CellData = group.Name;
-
-            CodeExample example = args.Node as CodeExample;
-            if (example != null)
-                args.CellData = example.RegionName;
-        }
-
-        void treeList_VirtualTreeGetChildNodes(object sender, VirtualTreeGetChildNodesInfo args)
-        {
-            if (treeListRootNodeLoading)
-            {
-                args.Children = examples;
-                treeListRootNodeLoading = false;
-            }
-            else
-            {
-                if (args.Node == null)
-                    return;
-                CodeExampleGroup group = args.Node as CodeExampleGroup;
-                if (group != null)
-                    args.Children = group.Examples;
-            }
-        }
-        void ShowFirstExample()
-        {
+            treeList1.DataSource = examples;
             treeList1.ExpandAll();
-            if (treeList1.Nodes.Count > 0)
-                treeList1.FocusedNode = treeList1.MoveFirst().FirstNode;
-        }
-        void OnNewExampleSelected(object sender, FocusedNodeChangedEventArgs e)
-        {
-            CodeExample newExample = (sender as TreeList).GetDataRecordByNode(e.Node) as CodeExample;
-            CodeExample oldExample = (sender as TreeList).GetDataRecordByNode(e.OldNode) as CodeExample;
-
-            if (newExample == null)
-                return;
-
-            string exampleCode = codeEditor.ShowExample(oldExample, newExample);
-            codeExampleNameLbl.Text = CodeExampleDemoUtils.ConvertStringToMoreHumanReadableForm(newExample.RegionName) + " example";
-            CodeEvaluationEventArgs args = new CodeEvaluationEventArgs();
-            InitializeCodeEvaluationEventArgs(args, newExample.RegionName);
-            evaluator.ForceCompile(args);
-
-        }
-        void InitializeCodeEvaluationEventArgs(CodeEvaluationEventArgs e, string regionName)
-        {
-            e.Result = true;
-            e.Code = codeEditor.CurrentCodeEditor.Text;
-            e.Language = CurrentExampleLanguage;
-            e.EvaluationParameter = workbook;
-            e.RegionName = regionName;
-        }
-        void OnExampleEvaluatorQueryEvaluate(object sender, CodeEvaluationEventArgs e)
-        {
-            e.Result = false;
-            if (codeEditor.RichEditTextChanged)
-            {// && compileComplete) {
-                TimeSpan span = DateTime.Now - codeEditor.LastExampleCodeModifiedTime;
-
-                if (span < TimeSpan.FromMilliseconds(1000))
-                {//CompileTimeIntervalInMilliseconds  1900
-                    codeEditor.ResetLastExampleModifiedTime();
-                    return;
-                }
-                //e.Result = true;
-                InitializeCodeEvaluationEventArgs(e, e.RegionName);
-            }
+            treeList1.BestFitColumns();
         }
 
-        void xtraTabControl1_SelectedPageChanged(object sender, TabPageChangedEventArgs e)
-        {
-            ExampleLanguage value = (ExampleLanguage)(xtraTabControl1.SelectedTabPageIndex);
-            if (codeEditor != null)
-                this.codeEditor.CurrentExampleLanguage = value;
-        }
-
-        void SpreadsheetAPIModule_Disposed(object sender, EventArgs e)
-        {
-            evaluator.Dispose();
-        }
-
-        void DisableTabs(int examplesCSCount, int examplesVBCount)
-        {
-            if (examplesCSCount == 0)
-                xtraTabControl1.TabPages[(int)ExampleLanguage.Csharp].PageEnabled = false;
-            if (examplesVBCount == 0)
-                xtraTabControl1.TabPages[(int)ExampleLanguage.VB].PageEnabled = false;
-        }
 
         private void btnOpenExcel_Click(object sender, EventArgs e)
         {
-            string fileName = "SampleDocument.xlsx";
-            workbook.SaveDocument(fileName, DocumentFormat.Xlsx);
-            Process.Start(fileName);
+            LoadDocumentFromFile();
+            SpreadsheetExample example = treeList1.GetDataRecordByNode(treeList1.FocusedNode) as SpreadsheetExample;
+            if (example == null)
+                return;
+            Action<Workbook> action = example.Action;
+            action(workbook);
+            SaveDocumentToFile();
         }
+
+        // ------------------- Load and Save a Document -------------------
+        private void LoadDocumentFromFile()
+        {
+            #region #LoadDocumentFromFile
+            // Load a workbook from the file.
+            workbook.LoadDocument("PivotTableTemplate.xlsx", DocumentFormat.OpenXml);
+            #endregion #LoadDocumentFromFile
+        }
+
+
+        private void SaveDocumentToFile()
+        {
+            #region #SaveDocumentToFile
+            // Save the modified document to the file.
+            workbook.SaveDocument("SavedDocument.xlsx", DocumentFormat.OpenXml);
+            #endregion #SaveDocumentToFile
+            Process.Start(new ProcessStartInfo("SavedDocument.xlsx") { UseShellExecute = true });
+        }
+
     }
 }

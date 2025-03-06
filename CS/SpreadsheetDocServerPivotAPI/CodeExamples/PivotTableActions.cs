@@ -1,9 +1,19 @@
 ﻿using DevExpress.Spreadsheet;
+using System;
 
 namespace SpreadsheetDocServerPivotAPI
 {
     public static class PivotTableActions
     {
+        public static Action<Workbook> CreatePivotTableFromRangeAction = CreatePivotTableFromRange;
+        public static Action<Workbook> CreatePivotTableFromCacheAction = CreatePivotTableFromCache;
+        public static Action<Workbook> RemovePivotTableAction = RemovePivotTable;
+        public static Action<Workbook> ChangePivotTableLocationAction = ChangePivotTableLocation;
+        public static Action<Workbook> MovePivotTableToWorksheetAction = MovePivotTableToWorksheet;
+        public static Action<Workbook> ChangePivotTableDataSourceAction = ChangePivotTableDataSource;
+        public static Action<Workbook> ClearPivotTableAction = ClearPivotTable;
+        public static Action<Workbook> ChangeBehaviorOptionsAction = ChangeBehaviorOptions;
+
 
         static void CreatePivotTableFromRange(IWorkbook workbook)
         {

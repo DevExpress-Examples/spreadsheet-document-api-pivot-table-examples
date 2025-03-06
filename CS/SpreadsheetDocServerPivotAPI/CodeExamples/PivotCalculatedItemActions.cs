@@ -1,9 +1,15 @@
-﻿using DevExpress.Spreadsheet;
+﻿using DevExpress.Charts.Model;
+using DevExpress.Spreadsheet;
+using System;
 
 namespace SpreadsheetDocServerPivotAPI
 {
     class PivotCalculatedItemActions
     {
+
+        public static Action<Workbook> AddCalculatedItemAction = AddCalculatedItem;
+        public static Action<Workbook> RemoveCalculatedItemAction = RemoveCalculatedItem;
+        public static Action<Workbook> ModifyCalculatedItemAction = ModifyCalculatedItem;
         static void AddCalculatedItem(IWorkbook workbook)
         {
             #region #AddCalculatedItem

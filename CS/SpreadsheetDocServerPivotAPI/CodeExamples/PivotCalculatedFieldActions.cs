@@ -1,9 +1,15 @@
-﻿using DevExpress.Spreadsheet;
+﻿using DevExpress.Charts.Model;
+using DevExpress.Spreadsheet;
+using System;
 
 namespace SpreadsheetDocServerPivotAPI
 {
     class PivotCalculatedFieldActions
     {
+
+        public static Action<Workbook> AddCalculatedFieldAction = AddCalculatedField;
+        public static Action<Workbook> RemoveCalculatedFieldAction = RemoveCalculatedField;
+        public static Action<Workbook> ModifyCalculatedFieldAction = ModifyCalculatedField;
         static void AddCalculatedField(IWorkbook workbook)
         {
             #region #AddCalculatedField

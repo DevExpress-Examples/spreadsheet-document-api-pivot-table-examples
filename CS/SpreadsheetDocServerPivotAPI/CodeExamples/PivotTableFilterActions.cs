@@ -1,9 +1,17 @@
 ﻿using DevExpress.Spreadsheet;
+using System;
 
 namespace SpreadsheetDocServerPivotAPI
 {
     public static class PivotTableFilterActions
     {
+        public static Action<Workbook> SetItemFilterAction = SetItemFilter;
+        public static Action<Workbook> SetItemVisibilityFilterAction = SetItemVisibilityFilter;
+        public static Action<Workbook> SetLabelFilterAction = SetLabelFilter;
+        public static Action<Workbook> SetValueFilterAction = SetValueFilter;
+        public static Action<Workbook> SetTop10FilterAction = SetTop10Filter;
+        public static Action<Workbook> SetDateFilterAction = SetDateFilter;
+        public static Action<Workbook> SetMultipleFilterAction = SetMultipleFilter;
         static void SetItemFilter(IWorkbook workbook)
         {
             #region #ItemFilter

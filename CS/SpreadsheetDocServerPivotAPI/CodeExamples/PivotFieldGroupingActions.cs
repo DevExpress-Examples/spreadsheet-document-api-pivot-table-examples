@@ -1,10 +1,16 @@
 ﻿using DevExpress.Spreadsheet;
+using System;
 using System.Collections.Generic;
 
 namespace SpreadsheetDocServerPivotAPI
 {
     class PivotFieldGroupingActions
     {
+        public static Action<Workbook> GroupFieldItemsAction = GroupFieldItems;
+        public static Action<Workbook> GroupFieldByDatesAction = GroupFieldByDates;
+        public static Action<Workbook> UngroupSpecificItemAction = UngroupSpecificItem;
+        public static Action<Workbook> UngroupFieldItemsAction = UngroupFieldItems;
+
         static void GroupFieldItems(IWorkbook workbook)
         {
             #region #GroupFieldItems

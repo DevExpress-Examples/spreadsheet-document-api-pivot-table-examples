@@ -1,4 +1,5 @@
 ﻿Imports DevExpress.Spreadsheet
+Imports DevExpress.XtraEditors
 Imports DevExpress.XtraTab
 Imports DevExpress.XtraTreeList
 Imports DevExpress.XtraTreeList.Columns
@@ -10,206 +11,149 @@ Imports System.IO
 Imports System.Windows.Forms
 
 Namespace SpreadsheetDocServerPivotAPI
-    Partial Public Class Form1
-        Inherits DevExpress.XtraEditors.XtraForm
+	Partial Public Class Form1
+		Inherits DevExpress.XtraEditors.XtraForm
 
-        Private workbook As New Workbook()
-        Private defaultCulture As New CultureInfo("en-US")
+		Private workbook As New Workbook()
+		Public Sub New()
+			InitializeComponent()
+			InitTreeListControl()
+			workbook.Options.CalculationMode = WorkbookCalculationMode.Automatic
+		End Sub
 
-        Private codeEditor As ExampleCodeEditor
-        Private evaluator As ExampleEvaluatorByTimer
-        Private examples As List(Of CodeExampleGroup)
-        Private treeListRootNodeLoading As Boolean = True
+		Private Sub InitTreeListControl()
+			Dim examples As New GroupsOfSpreadsheetExamples()
+			InitData(examples)
+			DataBinding(examples)
+		End Sub
 
-        Public Sub New()
-            InitializeComponent()
-            Dim examplePath As String = CodeExampleDemoUtils.GetExamplePath("CodeExamples")
+		Private Sub InitData(ByVal examples As GroupsOfSpreadsheetExamples)
+#Region "GroupNodes"
+			examples.Add(New SpreadsheetNode("Pivot Calculated Fields"))
+			examples.Add(New SpreadsheetNode("Pivot Calculated Item"))
+			examples.Add(New SpreadsheetNode("Pivot Fields"))
+			examples.Add(New SpreadsheetNode("Pivot Field Groups"))
+			examples.Add(New SpreadsheetNode("Pivot Tables"))
+			examples.Add(New SpreadsheetNode("Pivot Table Filter"))
+			examples.Add(New SpreadsheetNode("Pivot Table Formatting"))
+			examples.Add(New SpreadsheetNode("Pivot Table Layout"))
+			examples.Add(New SpreadsheetNode("Value Field Settings"))
 
-            Dim examplesCS As Dictionary(Of String, FileInfo) = CodeExampleDemoUtils.GatherExamplesFromProject(examplePath, ExampleLanguage.Csharp)
-            Dim examplesVB As Dictionary(Of String, FileInfo) = CodeExampleDemoUtils.GatherExamplesFromProject(examplePath, ExampleLanguage.VB)
-            DisableTabs(examplesCS.Count, examplesVB.Count)
-            Me.examples = CodeExampleDemoUtils.FindExamples(examplePath, examplesCS, examplesVB)
-            RearrangeExamples()
-            MergeGroups()
-            ShowExamplesInTreeList(treeList1, examples)
+#End Region
 
-            Me.codeEditor = New ExampleCodeEditor(richEditControlCS, richEditControlVB)
-            CurrentExampleLanguage = CodeExampleDemoUtils.DetectExampleLanguage("SpreadsheetDocServerPivotAPI")
-            Me.evaluator = New SpreadsheetExampleEvaluatorByTimer()
+#Region "ExampleNodes"
+			' Add nodes to the "Calculated Field" group of examples.
+			examples(0).Groups.Add(New SpreadsheetExample("Add Calculated Field", PivotCalculatedFieldActions.AddCalculatedFieldAction))
+			examples(0).Groups.Add(New SpreadsheetExample("Modify Calculated Field", PivotCalculatedFieldActions.ModifyCalculatedFieldAction))
+			examples(0).Groups.Add(New SpreadsheetExample("Remove Calculated Field", PivotCalculatedFieldActions.RemoveCalculatedFieldAction))
 
-            AddHandler Me.evaluator.QueryEvaluate, AddressOf OnExampleEvaluatorQueryEvaluate
-            AddHandler Me.evaluator.OnBeforeCompile, AddressOf evaluator_OnBeforeCompile
-            AddHandler Me.evaluator.OnAfterCompile, AddressOf evaluator_OnAfterCompile
+			' Add nodes to the "Calculated Item" group of examples.
+			examples(1).Groups.Add(New SpreadsheetExample("Add Calculated Item", PivotCalculatedItemActions.AddCalculatedItemAction))
+			examples(1).Groups.Add(New SpreadsheetExample("Modify Calculated Item", PivotCalculatedItemActions.ModifyCalculatedItemAction))
+			examples(1).Groups.Add(New SpreadsheetExample("Remove Calculated Item", PivotCalculatedItemActions.RemoveCalculatedItemAction))
 
-            ShowFirstExample()
-            AddHandler xtraTabControl1.SelectedPageChanged, AddressOf xtraTabControl1_SelectedPageChanged
-        End Sub
+			' Add nodes to the "Pivot Field" group of examples.
+			examples(2).Groups.Add(New SpreadsheetExample("Add Field to Axis", PivotFieldActions.AddFieldToAxisAction))
+			examples(2).Groups.Add(New SpreadsheetExample("Insert Field to Axis", PivotFieldActions.InsertFieldToAxisAction))
+			examples(2).Groups.Add(New SpreadsheetExample("Move Field Down", PivotFieldActions.MoveFieldDownAction))
+			examples(2).Groups.Add(New SpreadsheetExample("Move Field to Axis", PivotFieldActions.MoveFieldToAxisAction))
+			examples(2).Groups.Add(New SpreadsheetExample("Move Field Up", PivotFieldActions.MoveFieldUpAction))
+			examples(2).Groups.Add(New SpreadsheetExample("Multiple Subtotals", PivotFieldActions.MultipleSubtotalsAction))
+			examples(2).Groups.Add(New SpreadsheetExample("Remove Field from Axis", PivotFieldActions.RemoveFieldFromAxisAction))
+			examples(2).Groups.Add(New SpreadsheetExample("Sort Field Items", PivotFieldActions.SortFieldItemsAction))
+			examples(2).Groups.Add(New SpreadsheetExample("Sort Field Items by Data Field", PivotFieldActions.SortFieldItemsByDataFieldAction))
 
-        Private Sub MergeGroups()
-            Dim uniqueNameGroup = New Dictionary(Of String, CodeExampleGroup)()
-            For Each n As CodeExampleGroup In examples
-                If uniqueNameGroup.ContainsKey(n.Name) Then
-                    uniqueNameGroup(n.Name).Merge(n)
-                Else
-                    uniqueNameGroup(n.Name) = n
-                End If
-            Next n
 
-            examples.Clear()
-            For Each value In uniqueNameGroup.Values
-                examples.Add(value)
-            Next value
-        End Sub
+			' Add nodes to the "Chart Legend" group of examples.
+			examples(3).Groups.Add(New SpreadsheetExample("Group Field by Dates", PivotFieldGroupingActions.GroupFieldByDatesAction))
+			examples(3).Groups.Add(New SpreadsheetExample("Group Field Items", PivotFieldGroupingActions.GroupFieldItemsAction))
+			examples(3).Groups.Add(New SpreadsheetExample("Ungroup Field Items", PivotFieldGroupingActions.UngroupFieldItemsAction))
+			examples(3).Groups.Add(New SpreadsheetExample("Ungroup Specific Item", PivotFieldGroupingActions.UngroupSpecificItemAction))
 
-        Private Sub RearrangeExamples()
-            Dim i As Integer = 0
-            Do While i < examples.Count
-                Dim group As CodeExampleGroup = examples(i)
-                If group.Name = "Pivot Table Actions" Then
-                    examples.RemoveAt(i)
-                    examples.Insert(0, group)
-                    Exit Do
-                End If
-                i += 1
-            Loop
-        End Sub
+			' Add nodes to the "Pivot Table" group of examples.        
+			examples(4).Groups.Add(New SpreadsheetExample("Create Pivot Table from Cache", PivotTableActions.CreatePivotTableFromCacheAction))
+			examples(4).Groups.Add(New SpreadsheetExample("Create Pivot Table from Range", PivotTableActions.CreatePivotTableFromRangeAction))
+			examples(4).Groups.Add(New SpreadsheetExample("Change Behavior Options", PivotTableActions.ChangeBehaviorOptionsAction))
+			examples(4).Groups.Add(New SpreadsheetExample("Change Pivot Table Data Source", PivotTableActions.ChangePivotTableDataSourceAction))
+			examples(4).Groups.Add(New SpreadsheetExample("Change Pivot Table Location", PivotTableActions.ChangePivotTableLocationAction))
+			examples(4).Groups.Add(New SpreadsheetExample("Clear Pivot Table", PivotTableActions.ClearPivotTableAction))
+			examples(4).Groups.Add(New SpreadsheetExample("Move Pivot Table to Worksheet", PivotTableActions.MovePivotTableToWorksheetAction))
+			examples(4).Groups.Add(New SpreadsheetExample("Remove Pivot Table", PivotTableActions.RemovePivotTableAction))
 
-        Private Sub evaluator_OnAfterCompile(ByVal sender As Object, ByVal args As OnAfterCompileEventArgs)
-            codeEditor.AfterCompile(args.Result)
-            workbook.Worksheets.ActiveWorksheet.Visible = True
-            workbook.EndUpdate()
-        End Sub
+			' Add nodes to the "Pivot Table Filter" group of examples.
+			examples(5).Groups.Add(New SpreadsheetExample("Set Item Filter", PivotTableFilterActions.SetItemFilterAction))
+			examples(5).Groups.Add(New SpreadsheetExample("Set Label Filter", PivotTableFilterActions.SetLabelFilterAction))
+			examples(5).Groups.Add(New SpreadsheetExample("Set Date Filter", PivotTableFilterActions.SetDateFilterAction))
+			examples(5).Groups.Add(New SpreadsheetExample("Set Multiple Filter", PivotTableFilterActions.SetMultipleFilterAction))
+			examples(5).Groups.Add(New SpreadsheetExample("Set Top 10 Filter", PivotTableFilterActions.SetTop10FilterAction))
+			examples(5).Groups.Add(New SpreadsheetExample("Set Value Filter", PivotTableFilterActions.SetValueFilterAction))
+			examples(5).Groups.Add(New SpreadsheetExample("Set Item Visibility Filter", PivotTableFilterActions.SetItemVisibilityFilterAction))
 
-        Private Sub evaluator_OnBeforeCompile(ByVal sender As Object, ByVal e As EventArgs)
-            workbook.BeginUpdate()
-            codeEditor.BeforeCompile()
-            workbook.Options.Culture = defaultCulture
-            Dim loaded As Boolean = workbook.LoadDocument("PivotTableTemplate.xlsx")
-            Debug.Assert(loaded)
-        End Sub
-        Private Property CurrentExampleLanguage() As ExampleLanguage
-            Get
-                Return CType(xtraTabControl1.SelectedTabPageIndex, ExampleLanguage)
-            End Get
-            Set(ByVal value As ExampleLanguage)
-                Me.codeEditor.CurrentExampleLanguage = value
-                xtraTabControl1.SelectedTabPageIndex = If(value = ExampleLanguage.Csharp, 0, 1)
-            End Set
-        End Property
-        Private Sub ShowExamplesInTreeList(ByVal treeList As TreeList, ByVal examples As List(Of CodeExampleGroup))
-'            #Region "InitializeTreeList"
-            treeList.OptionsPrint.UsePrintStyles = True
-            AddHandler treeList.FocusedNodeChanged, AddressOf OnNewExampleSelected
-            treeList.OptionsView.ShowColumns = False
-            treeList.OptionsView.ShowIndicator = False
+			' Add nodes to the "Pivot Table Formatting" group of examples.
+			examples(6).Groups.Add(New SpreadsheetExample("Banded Columns", PivotTableFormattingActions.BandedColumnsAction))
+			examples(6).Groups.Add(New SpreadsheetExample("Banded Rows", PivotTableFormattingActions.BandedRowsAction))
+			examples(6).Groups.Add(New SpreadsheetExample("Change Pivot Table Style", PivotTableFormattingActions.ChangeStylePivotTableAction))
+			examples(6).Groups.Add(New SpreadsheetExample("Show Column Headers", PivotTableFormattingActions.ShowColumnHeadersAction))
+			examples(6).Groups.Add(New SpreadsheetExample("Show Row Headers", PivotTableFormattingActions.ShowRowHeadersAction))
 
-            AddHandler treeList.VirtualTreeGetChildNodes, AddressOf treeList_VirtualTreeGetChildNodes
-            AddHandler treeList.VirtualTreeGetCellValue, AddressOf treeList_VirtualTreeGetCellValue
-'            #End Region
+			' Add nodes to the "Pivot Table Layout" group of examples.
+			examples(7).Groups.Add(New SpreadsheetExample("Column Grand Totals", PivotTableLayoutActions.ColumnGrandTotalsAction))
+			examples(7).Groups.Add(New SpreadsheetExample("Data On Rows", PivotTableLayoutActions.DataOnRowsAction))
+			examples(7).Groups.Add(New SpreadsheetExample("Hide All Subtotals", PivotTableLayoutActions.HideAllSubtotalsAction))
+			examples(7).Groups.Add(New SpreadsheetExample("Insert Blank Rows", PivotTableLayoutActions.InsertBlankRowsAction))
+			examples(7).Groups.Add(New SpreadsheetExample("Merge Titles", PivotTableLayoutActions.MergeTitlesAction))
+			examples(7).Groups.Add(New SpreadsheetExample("Remove Blank Rows", PivotTableLayoutActions.RemoveBlankRowsAction))
+			examples(7).Groups.Add(New SpreadsheetExample("Repeat All Item Labels", PivotTableLayoutActions.RepeatAllItemLabelsAction))
+			examples(7).Groups.Add(New SpreadsheetExample("Row Grand Totals", PivotTableLayoutActions.RowGrandTotalsAction))
+			examples(7).Groups.Add(New SpreadsheetExample("Set Compact Report Layout", PivotTableLayoutActions.SetCompactReportLayoutAction))
+			examples(7).Groups.Add(New SpreadsheetExample("Set Outline Report Layout", PivotTableLayoutActions.SetOutlineReportLayoutAction))
+			examples(7).Groups.Add(New SpreadsheetExample("Set Tabular Report Layout", PivotTableLayoutActions.SetTabularReportLayoutAction))
+			examples(7).Groups.Add(New SpreadsheetExample("Show All Subtotals", PivotTableLayoutActions.ShowAllSubtotalsAction))
 
-            Dim col1 As New TreeListColumn()
-            col1.VisibleIndex = 0
-            col1.OptionsColumn.AllowEdit = False
-            col1.OptionsColumn.AllowMove = False
-            col1.OptionsColumn.ReadOnly = True
-            treeList.Columns.AddRange(New TreeListColumn() { col1 })
+			' Add nodes to the "Value Field Settings" group of examples.
+			examples(8).Groups.Add(New SpreadsheetExample("Change Summary Function", ValueFieldSettingsActions.ChangeSummaryFunctionAction))
+			examples(8).Groups.Add(New SpreadsheetExample("Difference From", ValueFieldSettingsActions.DifferenceFromAction))
+			examples(8).Groups.Add(New SpreadsheetExample("Number Format", ValueFieldSettingsActions.NumberFormatAction))
+			examples(8).Groups.Add(New SpreadsheetExample("Percent Of", ValueFieldSettingsActions.PercentOfAction))
+			examples(8).Groups.Add(New SpreadsheetExample("Percent Of Parent Row", ValueFieldSettingsActions.PercentOfParentRowTotalAction))
+			examples(8).Groups.Add(New SpreadsheetExample("Rank Largest to Smallest", ValueFieldSettingsActions.RankLargestToSmallestAction))
+			examples(8).Groups.Add(New SpreadsheetExample("Running Total In", ValueFieldSettingsActions.RunningTotalInAction))
+#End Region
+		End Sub
 
-            treeList.DataSource = New Object()
-            treeList.ExpandAll()
-        End Sub
+		Private Sub DataBinding(ByVal examples As GroupsOfSpreadsheetExamples)
+			treeList1.DataSource = examples
+			treeList1.ExpandAll()
+			treeList1.BestFitColumns()
+		End Sub
 
-        Private Sub treeList_VirtualTreeGetCellValue(ByVal sender As Object, ByVal args As VirtualTreeGetCellValueInfo)
-            Dim group As CodeExampleGroup = TryCast(args.Node, CodeExampleGroup)
-            If group IsNot Nothing Then
-                args.CellData = group.Name
-            End If
 
-            Dim example As CodeExample = TryCast(args.Node, CodeExample)
-            If example IsNot Nothing Then
-                args.CellData = example.RegionName
-            End If
-        End Sub
+		Private Sub btnOpenExcel_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnOpenExcel.Click
+			LoadDocumentFromFile()
+			Dim example As SpreadsheetExample = TryCast(treeList1.GetDataRecordByNode(treeList1.FocusedNode), SpreadsheetExample)
+			If example Is Nothing Then
+				Return
+			End If
+			Dim action As Action(Of Workbook) = example.Action
+			action(workbook)
+			SaveDocumentToFile()
+		End Sub
 
-        Private Sub treeList_VirtualTreeGetChildNodes(ByVal sender As Object, ByVal args As VirtualTreeGetChildNodesInfo)
-            If treeListRootNodeLoading Then
-                args.Children = examples
-                treeListRootNodeLoading = False
-            Else
-                If args.Node Is Nothing Then
-                    Return
-                End If
-                Dim group As CodeExampleGroup = TryCast(args.Node, CodeExampleGroup)
-                If group IsNot Nothing Then
-                    args.Children = group.Examples
-                End If
-            End If
-        End Sub
-        Private Sub ShowFirstExample()
-            treeList1.ExpandAll()
-            If treeList1.Nodes.Count > 0 Then
-                treeList1.FocusedNode = treeList1.MoveFirst().FirstNode
-            End If
-        End Sub
-        Private Sub OnNewExampleSelected(ByVal sender As Object, ByVal e As FocusedNodeChangedEventArgs)
-            Dim newExample As CodeExample = TryCast((TryCast(sender, TreeList)).GetDataRecordByNode(e.Node), CodeExample)
-            Dim oldExample As CodeExample = TryCast((TryCast(sender, TreeList)).GetDataRecordByNode(e.OldNode), CodeExample)
+		' ------------------- Load and Save a Document -------------------
+		Private Sub LoadDocumentFromFile()
+#Region "#LoadDocumentFromFile"
+			' Load a workbook from the file.
+			workbook.LoadDocument("PivotTableTemplate.xlsx", DocumentFormat.OpenXml)
+#End Region ' #LoadDocumentFromFile
+		End Sub
 
-            If newExample Is Nothing Then
-                Return
-            End If
 
-            Dim exampleCode As String = codeEditor.ShowExample(oldExample, newExample)
-            codeExampleNameLbl.Text = CodeExampleDemoUtils.ConvertStringToMoreHumanReadableForm(newExample.RegionName) & " example"
-            Dim args As New CodeEvaluationEventArgs()
-            InitializeCodeEvaluationEventArgs(args, newExample.RegionName)
-            evaluator.ForceCompile(args)
-
-        End Sub
-        Private Sub InitializeCodeEvaluationEventArgs(ByVal e As CodeEvaluationEventArgs, ByVal regionName As String)
-            e.Result = True
-            e.Code = codeEditor.CurrentCodeEditor.Text
-            e.Language = CurrentExampleLanguage
-            e.EvaluationParameter = workbook
-            e.RegionName = regionName
-        End Sub
-        Private Sub OnExampleEvaluatorQueryEvaluate(ByVal sender As Object, ByVal e As CodeEvaluationEventArgs)
-            e.Result = False
-            If codeEditor.RichEditTextChanged Then
-                Dim span As TimeSpan = Date.Now.Subtract(codeEditor.LastExampleCodeModifiedTime)
-
-                If span < TimeSpan.FromMilliseconds(1000) Then
-                    codeEditor.ResetLastExampleModifiedTime()
-                    Return
-                End If
-                'e.Result = true;
-                InitializeCodeEvaluationEventArgs(e, e.RegionName)
-            End If
-        End Sub
-
-        Private Sub xtraTabControl1_SelectedPageChanged(ByVal sender As Object, ByVal e As TabPageChangedEventArgs)
-            Dim value As ExampleLanguage = CType(xtraTabControl1.SelectedTabPageIndex, ExampleLanguage)
-            If codeEditor IsNot Nothing Then
-                Me.codeEditor.CurrentExampleLanguage = value
-            End If
-        End Sub
-
-        Private Sub SpreadsheetAPIModule_Disposed(ByVal sender As Object, ByVal e As EventArgs)
-            evaluator.Dispose()
-        End Sub
-
-        Private Sub DisableTabs(ByVal examplesCSCount As Integer, ByVal examplesVBCount As Integer)
-            If examplesCSCount = 0 Then
-                xtraTabControl1.TabPages(CInt(ExampleLanguage.Csharp)).PageEnabled = False
-            End If
-            If examplesVBCount = 0 Then
-                xtraTabControl1.TabPages(CInt(ExampleLanguage.VB)).PageEnabled = False
-            End If
-        End Sub
-
-        Private Sub btnOpenExcel_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnOpenExcel.Click
-            Dim fileName As String = "SampleDocument.xlsx"
-            workbook.SaveDocument(fileName, DocumentFormat.Xlsx)
-            Process.Start(fileName)
-        End Sub
-    End Class
+		Private Sub SaveDocumentToFile()
+#Region "#SaveDocumentToFile"
+			' Save the modified document to the file.
+			workbook.SaveDocument("SavedDocument.xlsx", DocumentFormat.OpenXml)
+#End Region ' #SaveDocumentToFile
+			Process.Start(New ProcessStartInfo("SavedDocument.xlsx") With {.UseShellExecute = True})
+		End Sub
+	End Class
 End Namespace

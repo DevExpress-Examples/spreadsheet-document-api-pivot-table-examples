@@ -1,9 +1,21 @@
-﻿using DevExpress.Spreadsheet;
+﻿using DevExpress.Charts.Model;
+using DevExpress.Spreadsheet;
+using System;
 
 namespace SpreadsheetDocServerPivotAPI
 {
     public static class PivotFieldActions
     {
+        public static Action<Workbook> AddFieldToAxisAction = AddFieldToAxis;
+        public static Action<Workbook> InsertFieldToAxisAction = InsertFieldToAxis;
+        public static Action<Workbook> MoveFieldToAxisAction = MoveFieldToAxis;
+        public static Action<Workbook> MoveFieldUpAction = MoveFieldUp;
+        public static Action<Workbook> MoveFieldDownAction = MoveFieldDown;
+        public static Action<Workbook> RemoveFieldFromAxisAction = RemoveFieldFromAxis;
+        public static Action<Workbook> SortFieldItemsAction = SortFieldItems;
+        public static Action<Workbook> SortFieldItemsByDataFieldAction = SortFieldItemsByDataField;
+        public static Action<Workbook> MultipleSubtotalsAction = MultipleSubtotals;
+
         static void AddFieldToAxis(IWorkbook workbook)
         {
             #region #AddToAxis

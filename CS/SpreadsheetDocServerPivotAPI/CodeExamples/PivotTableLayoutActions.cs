@@ -1,9 +1,23 @@
 ﻿using DevExpress.Spreadsheet;
+using System;
 
 namespace SpreadsheetDocServerPivotAPI
 {
     public static class PivotTableLayoutActions
     {
+        public static Action<Workbook> ColumnGrandTotalsAction = ColumnGrandTotals;
+        public static Action<Workbook> RowGrandTotalsAction = RowGrandTotals;
+        public static Action<Workbook> DataOnRowsAction = DataOnRows;
+        public static Action<Workbook> MergeTitlesAction = MergeTitles;
+        public static Action<Workbook> ShowAllSubtotalsAction = ShowAllSubtotals;
+        public static Action<Workbook> HideAllSubtotalsAction = HideAllSubtotals;
+        public static Action<Workbook> SetCompactReportLayoutAction = SetCompactReportLayout;
+        public static Action<Workbook> SetOutlineReportLayoutAction = SetOutlineReportLayout;
+        public static Action<Workbook> SetTabularReportLayoutAction = SetTabularReportLayout;
+        public static Action<Workbook> RepeatAllItemLabelsAction = RepeatAllItemLabels;
+        public static Action<Workbook> InsertBlankRowsAction = InsertBlankRows;
+        public static Action<Workbook> RemoveBlankRowsAction = RemoveBlankRows;
+
         static void ColumnGrandTotals(IWorkbook workbook)
         {
             #region #ColumnGrandTotals

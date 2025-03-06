@@ -1,9 +1,17 @@
 ﻿using DevExpress.Spreadsheet;
+using System;
 
 namespace SpreadsheetDocServerPivotAPI
 {
     public static class PivotTableFormattingActions
     {
+
+        public static Action<Workbook> ChangeStylePivotTableAction = ChangeStylePivotTable;
+        public static Action<Workbook> BandedColumnsAction = BandedColumns;
+        public static Action<Workbook> BandedRowsAction = BandedRows;
+        public static Action<Workbook> ShowColumnHeadersAction = ShowColumnHeaders;
+        public static Action<Workbook> ShowRowHeadersAction = ShowRowHeaders;
+
 
         static void ChangeStylePivotTable(IWorkbook workbook)
         {

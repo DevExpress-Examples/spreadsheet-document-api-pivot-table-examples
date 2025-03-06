@@ -1,9 +1,18 @@
 ﻿using DevExpress.Spreadsheet;
+using System;
 
 namespace SpreadsheetDocServerPivotAPI
 {
     public static class ValueFieldSettingsActions
     {
+        public static Action<Workbook> ChangeSummaryFunctionAction = ChangeSummaryFunction;
+        public static Action<Workbook> DifferenceFromAction = DifferenceFrom;
+        public static Action<Workbook> PercentOfAction = PercentOf;
+        public static Action<Workbook> PercentOfParentRowTotalAction = PercentOfParentRowTotal;
+        public static Action<Workbook> RankLargestToSmallestAction = RankLargestToSmallest;
+        public static Action<Workbook> RunningTotalInAction = RunningTotalIn;
+        public static Action<Workbook> NumberFormatAction = NumberFormat;
+
         static void ChangeSummaryFunction(IWorkbook workbook)
         {
             #region #ChangeSummaryFunction
