@@ -33,7 +33,7 @@ The application form contains the list of supported operations. A user can selec
 * [Spreadsheet Pivot Tables](https://docs.devexpress.com/OfficeFileAPI/118492/spreadsheet-document-api/pivot-tables)
 * [Pivot Table Examples](https://docs.devexpress.com/OfficeFileAPI/118495/spreadsheet-document-api/examples/pivot-tables)
 <!-- feedback -->
-## Does this example address your development requirements/objectives?
+## Does This Example Address Your Development Requirements/Objectives?
 
 [<img src="https://www.devexpress.com/support/examples/i/yes-button.svg"/>](https://www.devexpress.com/support/examples/survey.xml?utm_source=github&utm_campaign=spreadsheet-document-api-pivot-table-examples&~~~was_helpful=yes) [<img src="https://www.devexpress.com/support/examples/i/no-button.svg"/>](https://www.devexpress.com/support/examples/survey.xml?utm_source=github&utm_campaign=spreadsheet-document-api-pivot-table-examples&~~~was_helpful=no)
 
